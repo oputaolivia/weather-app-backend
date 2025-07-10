@@ -5,6 +5,8 @@ import cors from 'cors';
 import startDB from './config/db.js';
 import processError from './src/middlewares/processError.middleware.js';
 
+import userRouter from './src/routers/user.router.js';
+
 dotenv.config();
 const app = express();
 await startDB().then();
@@ -17,6 +19,9 @@ app.use(
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Routers
+app.use('/users', userRouter);
 
 // Central error processing middleware
 app.use(processError);

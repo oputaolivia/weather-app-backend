@@ -21,14 +21,21 @@
   },
   "homepage": "https://github.com/oputaolivia/weather-app-backend#readme",
   "dependencies": {
+    "argon2": "^0.43.0",
     "cors": "^2.8.5",
     "dotenv": "^17.0.1",
     "express": "^5.1.0",
+    "handlebars": "^4.7.8",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.17.0",
     "mongoose": "^8.16.1",
     "nodemailer": "^7.0.4"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "@babel/preset-env": "^7.28.0",
+    "chai": "^5.2.1",
+    "mocha": "^11.7.1",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.3"
   }
 }
