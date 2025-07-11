@@ -95,7 +95,7 @@ export default class UserService {
       const userRecord = await userRepo.getUserByEmail(email)
 
       if (!userRecord) {
-        throw new NotFoundExpection("User not found");
+        throw new NotFoundExpection("Invalid Credentials");
       }
 
       // Check password is correct
@@ -105,7 +105,7 @@ export default class UserService {
       );
 
       if (!isCorrectPassword) {
-        throw new BadRequestExpection("Incorrect credentials");
+        throw new BadRequestExpection("Invalid credentials");
       }
 
       // Hydrated payload to select custom fields to encrypt
