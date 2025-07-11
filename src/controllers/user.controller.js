@@ -21,7 +21,9 @@ async function createUserController(request, response, next) {
 async function userLoginController(request, response, next) {
   try {
     const accessToken = await userService.authenticate(request.body);
-    res.data = accessToken
+    res.data = {
+      token: accessToken,
+    }
     res.message = 'Login Successful'
     res.status = 200
     response.status(200).json(res);
