@@ -1,5 +1,12 @@
 import mongoose, { Schema } from "mongoose";
 
+/**
+ * TODO: Evaluate the best approach for user location handling:
+ * - Option 1: Store user's state in the user model for quick weather lookups
+ * - Option 2: Determine user location dynamically on each request
+ * Decide based on performance, accuracy, and user experience trade-offs.
+ */
+
 const userSchema = new Schema(
   {
     firstName: {
