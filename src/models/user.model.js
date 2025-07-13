@@ -19,12 +19,15 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      required: true,
-      unique: String,
+      required: false,
+      unique: true,
+      sparse: true, // allow multiple docs with null/undefined
     },
     phoneNumber: {
       type: String,
-      required: true,
+      required: false,
+      unique: true,
+      sparse: true, // allow multiple docs with null/undefined
     },
     password: {
       type: String,
