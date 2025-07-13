@@ -29,6 +29,15 @@ export default class UserRepo {
     }
   }
 
+  async getUserByPhoneNumber(phoneNumber) {
+    try {
+      const userRecord = await UserModel.findOne({ phoneNumber });
+      return userRecord;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getUserById(userId) {
     try {
       return await UserModel.findOne({ _id: userId }).select('-password');

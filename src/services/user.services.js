@@ -15,12 +15,18 @@ dotenv.config();
 export const userRepo = new UserRepo();
 export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,30}$/;
+export const phoneNumberRegex = /^(?:\+234|0)[789][01]\d{8}$/;
 
 export default class UserService {
   async createUser(payload) {
     try {
       let { firstName, lastName, phoneNumber, email, password } = payload;
-      email = email.trim();
+      if (email && typeof email === "string") {
+        email = email.trim();
+      }
+      if (phoneNumber && typeof phoneNumber === "string") {
+        phoneNumber = phoneNumber.trim();
+      }
 
       if (!firstName || typeof firstName !== "string") {
         throw new InputValidationExpection("Firstname is required");
@@ -30,12 +36,36 @@ export default class UserService {
         throw new InputValidationExpection("Lastname is required");
       }
 
-      if (!email || typeof email !== "string" || !emailRegex.test(email)) {
-        throw new InputValidationExpection("A valid email address is required");
+      // Require at least one of email or phone number
+      if (!email && !phoneNumber) {
+        throw new InputValidationExpection("Either email or phone number is required");
       }
 
-      if (!phoneNumber || typeof phoneNumber !== "string") {
-        throw new InputValidationExpection("Phone Number is required");
+      // Validate email if provided
+      if (email) {
+        if (typeof email !== "string" || !emailRegex.test(email)) {
+          throw new InputValidationExpection("A valid email address is required");
+        }
+        // Check if email already exists
+        const existingEmailUser = await userRepo.getUserByEmail(email);
+        if (existingEmailUser) {
+          throw new BadRequestExpection("Email already in use");
+        }
+      }
+
+      // Validate phone number if provided
+      if (phoneNumber) {
+        if (typeof phoneNumber !== "string" || !phoneNumberRegex.test(phoneNumber)) {
+          throw new InputValidationExpection("A valid phone number is required");
+        }
+  
+        // Check if phone number already exists
+        if (userRepo.getUserByPhoneNumber) {
+          const existingPhoneUser = await userRepo.getUserByPhoneNumber(phoneNumber);
+          if (existingPhoneUser) {
+            throw new BadRequestExpection("Phone number already in use");
+          }
+        }
       }
 
       if (
@@ -44,13 +74,6 @@ export default class UserService {
         !passwordRegex.test(password)
       ) {
         throw new InputValidationExpection("A valid password is required");
-      }
-
-      // Check if user exist already
-      const userRecord = await userRepo.getUserByEmail(email);
-
-      if (userRecord) {
-        throw new BadRequestExpection("User account already exist");
       }
 
       // Hash password
@@ -77,11 +100,17 @@ export default class UserService {
   // User login
   async authenticate(payload) {
     try {
-      let { email, password } = payload;
-      email = email.trim();
+      let { email, phoneNumber, password } = payload;
+      if (email && typeof email === "string") {
+        email = email.trim();
+      }
+      if (phoneNumber && typeof phoneNumber === "string") {
+        phoneNumber = phoneNumber.trim();
+      }
 
-      if (!email || typeof email !== "string" || !emailRegex.test(email)) {
-        throw new InputValidationExpection("A valid email address is required");
+      // Require at least one of email or phone number
+      if ((!email || typeof email !== "string" || !emailRegex.test(email)) && (!phoneNumber || typeof phoneNumber !== "string")) {
+        throw new InputValidationExpection("A valid email or phone number is required");
       }
 
       if (
@@ -92,7 +121,14 @@ export default class UserService {
         throw new InputValidationExpection("A valid password is required");
       }
 
-      const userRecord = await userRepo.getUserByEmail(email)
+      let userRecord = null;
+      if (email && emailRegex.test(email)) {
+        userRecord = await userRepo.getUserByEmail(email);
+      } else if (phoneNumber) {
+        if (userRepo.getUserByPhoneNumber) {
+          userRecord = await userRepo.getUserByPhoneNumber(phoneNumber);
+        }
+      }
 
       if (!userRecord) {
         throw new NotFoundExpection("User not found");
@@ -125,7 +161,7 @@ export default class UserService {
     }
   }
 
-  // Retrieve User
+  // Retrieve Users
   async getUsers() {
     try {
       const usersRecord = await userRepo.fetchUserRecords();
