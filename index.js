@@ -6,6 +6,7 @@ import startDB from './config/db.js';
 import processError from './src/middlewares/processError.middleware.js';
 
 import userRouter from './src/routers/user.router.js';
+import weatherRouter from "./src/routers/weather.router.js";
 
 dotenv.config();
 const app = express();
@@ -22,6 +23,7 @@ app.use(express.json());
 
 // Routers
 app.use('/users', userRouter);
+app.use('/api/weather', weatherRouter);
 
 // Central error processing middleware
 app.use(processError);
