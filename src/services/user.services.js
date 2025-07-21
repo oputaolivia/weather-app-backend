@@ -20,7 +20,7 @@ export const phoneNumberRegex = /^(?:\+234|0)[789][01]\d{8}$/;
 export default class UserService {
   async createUser(payload) {
     try {
-      let { firstName, lastName, phoneNumber, email, password } = payload;
+      let { firstName, lastName, phoneNumber, email, password, state, city, lga } = payload;
       if (email && typeof email === "string") {
         email = email.trim();
       }
@@ -76,6 +76,17 @@ export default class UserService {
         throw new InputValidationExpection("A valid password is required");
       }
 
+      // Validate state, city, and lga if provided
+      if (state && typeof state !== "string") {
+        throw new InputValidationExpection("State must be a valid string");
+      }
+      if (city && typeof city !== "string") {
+        throw new InputValidationExpection("City must be a valid string");
+      }
+      if (lga && typeof lga !== "string") {
+        throw new InputValidationExpection("LGA must be a valid string");
+      }
+
       // Hash password
       const hashedPassword = await argon2.hash(password);
 
@@ -84,6 +95,11 @@ export default class UserService {
         lastName,
         email,
         phoneNumber,
+        location:{
+          state: state || "",
+          city: city || "",
+          lga: lga || "",
+        },
         password: hashedPassword,
       };
 
@@ -190,11 +206,25 @@ export default class UserService {
   async updateUser(id, userId, payload) {
     try {
       const userRecord = await userRepo.getUserById(userId);
+      const { firstName, lastName, email, phoneNumber, state, city, lga } = payload;
       if (!userRecord) {
         throw new NotFoundExpection("User not found");
       }
       if (id !== userId) {
         throw new UnAuthorizedExpection("You dont have access");
+      }
+
+      // If city, state, or lga are present, update the location object in the payload
+      if (city || state || lga) {
+        payload.location = {
+          state: state || userRecord.location?.state || "",
+          city: city || userRecord.location?.city || "",
+          lga: lga || userRecord.location?.lga || "",
+        };
+        // Remove top-level city, state, lga to avoid duplication
+        delete payload.city;
+        delete payload.state;
+        delete payload.lga;
       }
 
       const updatedUserRecord = await userRepo.userUpdate(userId, payload);
