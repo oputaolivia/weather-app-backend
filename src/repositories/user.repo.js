@@ -3,12 +3,13 @@ import UserModel from '../models/user.model.js';
 export default class UserRepo {
   async createUserRecord(payload) {
     try {
-      const { firstName, lastName, email, phoneNumber, password } = payload;
+      const { firstName, lastName, email, phoneNumber, password, location } = payload;
       
       const newUserRecord = new UserModel({
         firstName,
         lastName,
         email,
+        location,
         phoneNumber,
         password,
       });
