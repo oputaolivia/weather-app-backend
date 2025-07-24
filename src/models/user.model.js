@@ -19,18 +19,39 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      required: true,
-      unique: String,
+      required: false,
+      unique: true,
+      sparse: true, 
     },
     phoneNumber: {
       type: String,
-      required: true,
+      required: false,
+      unique: true,
+      sparse: true,
     },
     password: {
       type: String,
       required: true,
     },
-   },
+    location: {
+      address: {
+        type: String,
+        default: "",
+      },
+      city: {
+        type: String,
+        default: "",
+      },
+      lga: {
+        type: String,
+        default: "",
+      },
+      state: {
+        type: String,
+        default: "",
+      },
+    },
+  },
   {
     timestamps: true,
   }

@@ -3,12 +3,13 @@ import UserModel from '../models/user.model.js';
 export default class UserRepo {
   async createUserRecord(payload) {
     try {
-      const { firstName, lastName, email, phoneNumber, password } = payload;
+      const { firstName, lastName, email, phoneNumber, password, location } = payload;
       
       const newUserRecord = new UserModel({
         firstName,
         lastName,
         email,
+        location,
         phoneNumber,
         password,
       });
@@ -23,6 +24,15 @@ export default class UserRepo {
   async getUserByEmail(email) {
     try {
       const userRecord = await UserModel.findOne({ email });
+      return userRecord;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getUserByPhoneNumber(phoneNumber) {
+    try {
+      const userRecord = await UserModel.findOne({ phoneNumber });
       return userRecord;
     } catch (error) {
       throw error;

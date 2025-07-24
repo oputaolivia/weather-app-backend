@@ -46,12 +46,16 @@ async function getUsersController(request, response, next){
 
 async function getUserController(request, response, next) {
   try {
-    const id = request.params;
-    const user = await userService.getUser(id.id);
-    res.data = user
-    res.message = 'User Retrieved'
-    res.status = 200
-    response.status(200).json(res)
+    // userId should be set by verifyAuth middleware
+    const userId = request.user && (request.user.userId || request.user._id || request.user.id);
+    if (!userId) {
+      return response.status(401).json({ message: 'Unauthorized: No user ID found in request.' });
+    }
+    const user = await userService.getUser(userId);
+    res.data = user;
+    res.message = 'User Retrieved';
+    res.status = 200;
+    response.status(200).json(res);
   } catch (error) {
     next(error)
   }

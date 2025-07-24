@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Routers
-app.use('/users', userRouter);
+app.use('/api/users', userRouter);
 app.use('/api/weather', weatherRouter);
 
 // Central error processing middleware
